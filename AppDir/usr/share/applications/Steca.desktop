@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Steca
+Exec=Steca
+Icon=Steca
+Comment=Steca program
+Terminal=false
+Categories=Neutron Scatering
