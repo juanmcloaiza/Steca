@@ -9,10 +9,12 @@ make -j$(nproc)
 
 
 echo "Copying AppDir..."
+ls -R ../AppDir
 cp -r ../AppDir ./
 
 echo "Copying Steca binary into AppDir..."
 ls -l ./main/Steca
+ls -R ./AppDir
 cp ./main/Steca ./AppDir/usr/bin/
 ls -l ./AppDir/usr/bin/
 
