@@ -45,7 +45,11 @@ after_success:
   - echo "PWD is..." ${PWD}
   - find ./ -iname "Steca*.AppImage*"
   - bash upload.sh Steca*.AppImage*
-
+  
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)$/
 
 addons:
   apt:
