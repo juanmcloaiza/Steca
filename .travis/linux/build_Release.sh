@@ -30,3 +30,5 @@ export VERSION=$(git rev-parse --short HEAD) # linuxdeployqt uses this for namin
 echo "Running linuxdeployqt..."
 ./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/share/applications/*.desktop -bundle-non-qt-libs
 ./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/share/applications/*.desktop -appimage
+
+cp ./Steca*.AppImage ../
