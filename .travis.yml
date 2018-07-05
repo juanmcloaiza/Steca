@@ -42,6 +42,8 @@ after_success:
   - find AppDir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
   - # curl --upload-file APPNAME*.AppImage https://transfer.sh/APPNAME-git.$(git rev-parse --short HEAD)-x86_64.AppImage
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - echo "PWD is..." ${PWD}
+  - find ./ -iname "Steca*.AppImage*"
   - bash upload.sh Steca*.AppImage*
 
 
