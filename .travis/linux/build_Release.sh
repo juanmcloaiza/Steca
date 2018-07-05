@@ -12,6 +12,7 @@ echo "Copying AppDir..."
 cp -r ../AppDir ./
 
 echo "Copying Steca binary into AppDir..."
+ls -l ./main/Steca
 cp ./main/Steca ./AppDir/usr/bin/
 ls -l ./AppDir/usr/bin/
 
