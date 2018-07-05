@@ -31,4 +31,5 @@ echo "Running linuxdeployqt..."
 ./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/share/applications/*.desktop -bundle-non-qt-libs
 ./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/share/applications/*.desktop -appimage
 
+chmod a+x ./Steca*.AppImage 
 cp ./Steca*.AppImage ../
