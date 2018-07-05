@@ -48,7 +48,7 @@ after_success:
 addons:
   apt:
     sources:
-    - sourceline: ppa:beineri/opt-qt-593-trusty
+    - sourceline: ppa:beineri/opt-qt-5.10.1-trusty
     packages:
-    - qt59base
+    - qt510base
     - xvfb
