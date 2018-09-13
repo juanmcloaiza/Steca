@@ -2,7 +2,7 @@
 //
 //  Steca: stress and texture calculator
 //
-//! @file      core/aux/angles.cpp
+//! @file      core/misc/angles.cpp
 //! @brief     Implements  classes deg and rad.
 //!
 //! @homepage  https://github.com/scgmlz/Steca
