@@ -12,14 +12,12 @@
 //
 //  ***********************************************************************************************
 
-#include "fastyamlloader.h"
-#include "core/typ/exception.h"
-#include <yaml.h>
-#include <QMap>
+#include "core/loaders/fastyamlloader.h"
+#include "core/aux/exception.h"
 #include <sstream>
 
 // Allows for a very verbious yaml parser for debugging purposes:
-#if VERBIOUS_YAML_PARSER
+#ifdef VERBIOUS_YAML_PARSER
     #define YAML_DEBUG_OUT(a) qDebug() << a;
 #else
     #define YAML_DEBUG_OUT(a)
@@ -29,65 +27,36 @@ namespace loadYAML {
 
 YamlNode::SequenceType::iterator YamlNode::begin()
 {
-    switch (nodeType_) {
-    case eNodeType::MAP:
-        THROW("node(map) doesn't have an iterator")
-        break;
-    case eNodeType::SEQUENCE:
-        return sequence_->begin();
-        break;
-    case eNodeType::SCALAR:
-        THROW("node(scalar) doesn't have an iterator")
-    }
+    if (nodeType_ != eNodeType::SEQUENCE)
+        THROW("unexpected node where we expected sequence begin");
+    return sequence_->begin();
 }
 
 YamlNode::SequenceType::iterator YamlNode::end()
 {
-    switch (nodeType_) {
-    case eNodeType::MAP:
-        THROW("node(map) doesn't have an iterator")
-        break;
-    case eNodeType::SEQUENCE:
-        return sequence_->end();
-        break;
-    case eNodeType::SCALAR:
-        THROW("node(scalar) doesn't have an iterator")
-    }
+    if (nodeType_ != eNodeType::SEQUENCE)
+        THROW("unexpected node where we expected sequence end");
+    return sequence_->end();
 }
 
 YamlNode::SequenceType::const_iterator YamlNode::begin() const
 {
-    switch (nodeType_) {
-    case eNodeType::MAP:
-        THROW("node(map) doesn't have an iterator")
-        break;
-    case eNodeType::SEQUENCE:
-        return sequence_->cbegin();
-        break;
-    case eNodeType::SCALAR:
-        THROW("node(scalar) doesn't have an iterator")
-    }
+    if (nodeType_ != eNodeType::SEQUENCE)
+        THROW("unexpected node where we expected sequence cbegin");
+    return sequence_->cbegin();
 }
 
 YamlNode::SequenceType::const_iterator YamlNode::end() const
 {
-    switch (nodeType_) {
-    case eNodeType::MAP:
-        THROW("node(map) doesn't have an iterator")
-        break;
-    case eNodeType::SEQUENCE:
-        return sequence_->cend();
-        break;
-    case eNodeType::SCALAR:
-        THROW("node(scalar) doesn't have an iterator")
-    }
+    if (nodeType_ != eNodeType::SEQUENCE)
+        THROW("unexpected node where we expected sequence cend");
+    return sequence_->cend();
 }
 
 yaml_event_type_t parser_parse(YamlParserType parser, yaml_event_t& event)
 {
-    if (!yaml_parser_parse(parser.get(), &event)) {
+    if (!yaml_parser_parse(parser.get(), &event))
        THROW(QString::fromStdString("Parser error " + std::to_string(parser->error)));
-    }
     return event.type;
 }
 
@@ -140,7 +109,7 @@ YamlNode parseYamlFast(YamlParserType parser, const yaml_event_t& prevEvent)
 
         yaml_event_t event;
         while(YAML_MAPPING_END_EVENT != parser_parse(parser, event)) {
-            QString key = QString::fromLatin1((char*)event.data.scalar.value);
+            QString key = QString::fromLatin1(reinterpret_cast<char*>(event.data.scalar.value));
             YAML_DEBUG_OUT("DEBUG[parseYamlFast2] key == " << key);
             yaml_event_delete(&event);
             parser_parse(parser, event);
@@ -158,12 +127,12 @@ YamlNode parseYamlFast(YamlParserType parser, const yaml_event_t& prevEvent)
         THROW(QString("Got alias (anchor %s)"));
         break;
     case YAML_SCALAR_EVENT:
-        YAML_DEBUG_OUT("DEBUG[parseYamlFast2] YAML_SCALAR_EVENT = " << QString::fromLatin1((char*)prevEvent.data.scalar.value));
-        if ((char*)prevEvent.data.scalar.tag // handle !array2d tag:
-                && std::string((char*)prevEvent.data.scalar.tag) == "!array2d") {
+        YAML_DEBUG_OUT("DEBUG[parseYamlFast2] YAML_SCALAR_EVENT = " << QString::fromLatin1(reinterpret_cast<char*>(prevEvent.data.scalar.value)));
+        if (reinterpret_cast<char*>(prevEvent.data.scalar.tag) // handle !array2d tag:
+                && std::string(reinterpret_cast<char*>(prevEvent.data.scalar.tag)) == "!array2d") {
             YAML_DEBUG_OUT("DEBUG[parseYamlFast2] YAML_SCALAR_EVENT, tag = !array2d");
 
-            std::stringstream arrayStr((char*)prevEvent.data.scalar.value, std::ios_base::in);
+            std::stringstream arrayStr(reinterpret_cast<char*>(prevEvent.data.scalar.value), std::ios_base::in);
 
             std::shared_ptr<YamlArray2d> array2d(new YamlArray2d);
 
@@ -173,15 +142,17 @@ YamlNode parseYamlFast(YamlParserType parser, const yaml_event_t& prevEvent)
             while ('[' != arrayStr.get())
             { }
             array2d->data.reserve(array2d->width * array2d->height);
-            for (int i = 0; i < array2d->width * array2d->height; i++) {
+            for (size_t i = 0; i < array2d->width * array2d->height; i++) {
                 int v;
                 arrayStr >> v;
                 array2d->data.push_back(v);
             }
             return YamlNode(array2d);
         }
-        YAML_DEBUG_OUT("DEBUG[parseYamlFast2] YAML_SCALAR_EVENT = " << QString::fromLatin1((char*)prevEvent.data.scalar.value));
-        return YamlNode(QString::fromLatin1((char*)prevEvent.data.scalar.value));
+        YAML_DEBUG_OUT("DEBUG[parseYamlFast2] YAML_SCALAR_EVENT = " << QString::fromLatin1(reinterpret_cast<char*>(prevEvent.data.scalar.value)));
+        return YamlNode(QString::fromLatin1(reinterpret_cast<char*>(prevEvent.data.scalar.value)));
+    default:
+        THROW("unexpected node in parseYamlFast");
     }
 }
 
@@ -206,4 +177,10 @@ const YamlNode loadYamlFast(const std::string& filePath) {
     return result;
 }
 
-} // namespace load
+FILE* FILEContainer::operator *() {
+    if (value_ == nullptr)
+        THROW("value is nullptr, but should be initialized");
+    return value_;
+}
+
+} // namespace loadYAML

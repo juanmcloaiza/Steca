@@ -15,11 +15,12 @@
 #ifndef POPUP_BIGTABLE_H
 #define POPUP_BIGTABLE_H
 
-#include "qcr/engine/enhance_widgets.h"
+#include "qcr/engine/mixin.h"
+#include "popup_base_dialog.h"
 
 //! Popup display of the present XY diagram.
 
-class PopupBigtable : public CModelessDialog {
+class PopupBigtable : public PopupBaseDialog {
 public:
     PopupBigtable();
 };

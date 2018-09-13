@@ -15,11 +15,12 @@
 #ifndef POPUP_POLEFIG_H
 #define POPUP_POLEFIG_H
 
-#include "qcr/engine/enhance_widgets.h"
+#include "qcr/engine/mixin.h"
+#include "popup_base_dialog.h"
 
 //! Popup display of the present pole figure.
 
-class PopupPolefig : public CModelessDialog {
+class PopupPolefig : public PopupBaseDialog {
 public:
     PopupPolefig();
 };
