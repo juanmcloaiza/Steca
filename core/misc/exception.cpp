@@ -12,7 +12,7 @@
 //
 //  ***********************************************************************************************
 
-#include "core/aux/exception.h"
+#include "core/misc/exception.h"
 #include "qcr/base/debug.h"
 
 Exception::Exception(const QString& msg) noexcept
